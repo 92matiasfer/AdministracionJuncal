@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?><project-modules id="moduleCoreId" project-version="1.5.0">
+        
+    <wb-module deploy-name="AdministracionJuncal">
+        <wb-resource deploy-path="/" source-path="/WebContent" tag="defaultRootSource"/>
+                
+        <property name="context-root" value="AdministracionJuncal"/>
+                
+        <property name="java-output-path" value="/AdministracionJuncal/build/classes"/>
+            
+    </wb-module>
+    
+</project-modules>
