@@ -14,10 +14,9 @@
     <link rel="stylesheet" href="keen/keen-ui.min.css">
     
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
-	
-	<script src="custom/data.js"></script>
+    
 	<script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
-	
+	<script src="pwa/vue.js"></script>
     <script src="phonegap.js"></script>		
  	<script src="vendors/fastclick.min.js" type="text/javascript"></script>    	 	
     	
@@ -27,6 +26,7 @@
     <script src="vendors/iscroll-min.js" type="text/javascript"></script>
     
 	<script src="mobileui/mui.min.js" type="text/javascript"></script>
+	<script src="custom/data.js"></script>
     <script src="custom/custom.js" type="text/javascript"></script>
 </head>
 <body>
@@ -144,45 +144,210 @@
 								</div>
 							</div>
 						</div>
-						<div id="detalle-edificio-page" class="mui-page">
+						<div id="edificio-page" class="mui-page">
 							<h3 slot="header">{{edificio.nombre}}</h3>
+							<div class="list-card-option">
+								<div class="card-option">
+									<div class="div-title-card align-v">
+										<h4 class="title-card">Ingresar Pago</h4>
+									</div>	
+									<p style="min-height: 43%;">Ingreso de pagos a proveedores o pagos por concepto de gastos comunes o fondo de reserva</p>
+									<ui-button 
+										color="primary" 
+										@click="mostrarFormIngresoPago"
+										>Ingresar
+									</ui-button>
+								</div>
+								<div class="card-option">
+									<div class="div-title-card align-v">
+										<h4 class="title-card">Estado de cuenta</h4>
+									</div>
+									<p style="min-height: 43%;">Detalle del estado de cuenta del mes corriente</p>
+									<ui-button 
+										color="primary" 
+										@click=""
+										>Ingresar
+									</ui-button>
+								</div>
+								<div class="card-option">
+									<div class="div-title-card align-v">
+										<h4 class="title-card">Copropietarios</h4>
+									</div>
+									<p style="min-height: 43%;">Listado de los copropietarios</p>
+									<ui-button 
+										color="primary" 
+										@click=""
+										>Ingresar
+									</ui-button>
+								</div>
+								<div class="card-option">
+									<div class="div-title-card align-v">
+										<h4 class="title-card">Notificaciones</h4>
+									</div>
+									<p style="min-height: 43%;">Avisos de reparaciones, reuniones u otros avisos de interes</p>
+									<ui-button 
+										color="primary" 
+										@click=""
+										>Ingresar
+									</ui-button>
+								</div>
+								<div class="card-option">
+									<div class="div-title-card align-v">
+										<h4 class="title-card">Detalle</h4>
+									</div>
+									<p style="min-height: 43%;">Detalle y edición de la informanción asociada al edificio seleccionado</p>
+									<ui-button 
+										color="primary" 
+										@click="mostrarDetalle"
+										>Ingresar
+									</ui-button>
+								</div>
+							</div>
+							
+						</div>
+						<div id="form-pagos-page" class="mui-page">
+							<h3 slot="header">{{edificio.nombre}}</h3>
+							<ui-tabs fullwidth>
+				                <ui-tab>
+				                    <div slot="header" class="my-custom-tab-header">
+				                       <span>Gastos</span>
+				                    </div>
+									<div>
+										<fieldset class="fieldset-form-ingreso">
+											<ui-select
+								                label="Seleccione una unidad"
+								                :options="edificio.unidades"
+								                v-model="nuevaTransaccion.unidad"
+								            ></ui-select>
+											<ui-textbox
+												label="Monto"
+												v-model="nuevaTransaccion.monto"	
+											></ui-textbox>
+											<ui-textbox
+												label="Gastos comunes"
+												v-model="nuevaTransaccion.gastosComunes"	
+											></ui-textbox>
+											<ui-textbox
+												label="Fondo de reserva"
+												v-model="nuevaTransaccion.fondoReserva"	
+											></ui-textbox>
+								            <ui-select
+								                label="Seleccionr mes"
+								                :options="mesesLiquidacion"
+								                v-model="nuevaTransaccion.mes"
+								            ></ui-select>
+								             <ui-datepicker
+								                icon="events"
+								                picker-type="modal"
+								                v-model="nuevaTransaccion.fecha"
+								            	>Fecha
+											</ui-datepicker>
+										</fieldset>
+										<div align="right" style="margin-top: 25px;">
+											<ui-button 
+												class="bnt-secondary-blue"
+												type="secondary"
+												color="primary" 
+												@click=""
+												>Restablecer
+											</ui-button>
+								            <ui-button 
+												color="primary" 
+												@click="guardarTransaccion()"
+												>Confirmar
+											</ui-button>
+										</div>
+									</div>
+				                </ui-tab>
+				                <ui-tab>
+				                    <div slot="header" class="my-custom-tab-header">
+				                        <span>Proveedores</span>
+									</div>
+									<div>
+										<fieldset class="fieldset-form-ingreso">
+											 <ui-select
+								                label="Seleccione un proveedor"
+								                :options="proveedores"
+								                v-model="nuevaTransaccion.proveedor"
+								            ></ui-select>
+											<ui-textbox
+												label="Monto"
+												v-model="nuevaTransaccion.monto"	
+											></ui-textbox>
+								            <ui-select
+								                label="Seleccionr mes"
+								                :options="mesesLiquidacion"
+								                v-model="nuevaTransaccion.mes"
+								            ></ui-select>
+								             <ui-datepicker
+								                icon="events"
+								                picker-type="modal"
+								                v-model="nuevaTransaccion.fecha"
+								            	>Fecha
+											</ui-datepicker>
+										</fieldset>
+										<div align="right" style="margin-top: 25px;">
+											<ui-button 
+												class="bnt-secondary-blue"
+												type="secondary"
+												color="primary" 
+												@click=""
+												>Restablecer
+											</ui-button>
+								            <ui-button 
+												color="primary" 
+												@click="guardarTransaccion()"
+												>Confirmar
+											</ui-button>
+										</div>
+									</div>
+				                </ui-tab>
+				            </ui-tabs>
+						</div>
+						<div id="detalle-edificio-page" class="mui-page">
+							<fieldset class="fieldset-form-ingreso">
+								 <ui-select
+					                label="Seleccione un año"
+					                :options="años"
+					                v-model="nuevoAnioMonto.anio"
+					            ></ui-select>
 								<ui-textbox
-									label="Monto"
-									v-model="nuevaTransaccion.monto"	
+									label="Ingrese un monto"
+									v-model="nuevoAnioMonto.monto"
 								></ui-textbox>
-								<ui-select
-					                label="Seleccione una unidad"
-					                :options="edificio.unidades"
-					                v-model="nuevaTransaccion.unidad"
-					            ></ui-select>
-					            <ui-select
-					                label="Seleccione un proveedor"
-					                :options="proveedores"
-					                v-model="nuevaTransaccion.proveedor"
-					            ></ui-select>
-					             <ui-datepicker
-					                icon="events"
-					                picker-type="modal"
-					                v-model="nuevaTransaccion.fecha"
-					            	>Fecha
-								</ui-datepicker>
+								<div align="center">
+									<ui-radio-group
+						                name="tipoDeMonto"
+						                :options="['Real', 'Estimado']"
+						                v-model="nuevoAnioMonto.tipoMonto"
+						            	>Seleccione el tipo de monto
+						            </ui-radio-group>
+					            </div>
+				            </fieldset>
+				            <div align="right" style="margin-top: 25px;">
+								<ui-button 
+									class="bnt-secondary-blue"
+									type="secondary"
+									color="primary" 
+									@click=""
+									>Restablecer
+								</ui-button>
 					            <ui-button 
 									color="primary" 
-									@click="guardarTransaccion()"
+									@click=""
 									>Confirmar
 								</ui-button>
-							
+							</div>
 						</div>
 					</div>
 				</div>
 			</div>	
 		</div>
 	</div>
-
-    <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
-	<script src="keen/keen-ui.min.js"></script>
-	<script src="custom/data.js"></script>
-	<script src="custom/custom.js" type="text/javascript"></script>
+	<script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
 	<script src="pwa/vue.js"></script>
+	<script src="keen/keen-ui.min.js"></script>
+	<script src="custom/custom.js" type="text/javascript"></script>
+	<script src="custom/data.js"></script>
 </body>
 </html>

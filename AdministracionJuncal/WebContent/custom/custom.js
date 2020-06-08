@@ -77,7 +77,7 @@ var vm = new Vue({
 				success: function(data){
 					if(data.status == 0){
 						vm.edificio = data.edificio;
-						mui.viewport.showPage('detalle-edificio-page');
+						mui.viewport.showPage('edificio-page', 'SLIDE_UP');
 					} else {
 						alert(data.mensaje);
 					}
@@ -88,6 +88,9 @@ var vm = new Vue({
 					alert('Error al intentar comunicarse con el servidor');
 				}
 			});
+		},
+		mostrarFormIngresoPago: function(){
+			mui.viewport.showPage('form-pagos-page', 'SLIDE_UP');
 		},
 		guardarTransaccion: function(){
 			var me = this;
@@ -118,6 +121,9 @@ var vm = new Vue({
 					alert('Error al intentar comunicarse con el servidor');
 				}				
 			})
+		},
+		mostrarDetalle: function(){
+			mui.viewport.showPage('detalle-edificio-page', 'SLIDE_UP');
 		}
 	}
 });
@@ -170,21 +176,26 @@ function installEvents() {
 	    },
 	    {
 	        id: 2,
+	        label: 'Pagos',
+	        icon: 'attach_money',
+	    },
+	    {
+	        id: 3,
 	        label: 'Usuarios',
 	        icon: 'group',
 	    },
 	    {
-	        id: 3,
+	        id: 4,
 	        label: 'Configuracion',
 	        icon: 'settings',
 	    },
 	    {
-	        id: 4,
+	        id: 5,
 	        label: 'Archivos',
 	        icon: 'cloud_queue',
 	    },
 	    {
-	        id: 5,
+	        id: 6,
 	        label: 'Avisos',
 	        icon: 'report_problem',
 	    }
@@ -485,6 +496,7 @@ function iniciarSistema(){
 			if(data.status==0){
 				vm.proveedores = data.proveedores;
 				vm.edificios = data.edificios;
+				vm.mesesLiquidacion = data.meses;
 				mui.screen.showPage('mui-screen-page' , 'NONE');
 				mui.busy(false);
 			} else {

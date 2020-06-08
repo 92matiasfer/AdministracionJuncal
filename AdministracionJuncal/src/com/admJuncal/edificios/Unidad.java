@@ -13,7 +13,7 @@ import com.admJuncal.usuarios.Copropietario;
 public class Unidad {
 
 	private int id = 0;
-	private int nroApartamento = 0;
+	private String nroApartamento = "";
 	private int idEdificio = 0;
 	private String tipoUnidad = "";
 	private Copropietario copropietario = null;
@@ -27,10 +27,10 @@ public class Unidad {
 	public void setId(int id) {
 		this.id = id;
 	}
-	public int getNroApartamento() {
+	public String getNroApartamento() {
 		return nroApartamento;
 	}
-	public void setNroApartamento(int nroApartamento) {
+	public void setNroApartamento(String nroApartamento) {
 		this.nroApartamento = nroApartamento;
 	}
 	public Copropietario getCopropietario() {
@@ -73,7 +73,7 @@ public class Unidad {
 	public Unidad() {
 		super();
 	}	
-	public Unidad(int id, int nroApartamento, int idEdificio, String tipoUnidad, Copropietario copropietario,
+	public Unidad(int id, String nroApartamento, int idEdificio, String tipoUnidad, Copropietario copropietario,
 			double saldoAnterior, double coeficiente, boolean pagaCochera) {
 		super();
 		this.id = id;
@@ -99,7 +99,7 @@ public class Unidad {
 			while(res.next()) {
 				Unidad u = new Unidad();
 				u.setId(res.getInt("idUnidad"));
-				u.setNroApartamento(res.getInt("apartamento"));
+				u.setNroApartamento(res.getString("apartamento"));
 				u.setIdEdificio(res.getInt("idEdificio"));
 				u.setTipoUnidad(res.getString("tipoUnidad"));
 				unidades.add(u);
@@ -125,7 +125,7 @@ public class Unidad {
 		json.put("nroApartamento", this.getNroApartamento());
 		json.put("edificio", this.getIdEdificio());
 		json.put("tipoUnidad", this.getTipoUnidad());
-		json.put("label", this.getNroApartamento() + this.getTipoUnidad()); //Para select de vue
+		json.put("label", this.getNroApartamento() + " " + this.getTipoUnidad()); //Para select de vue
 		json.put("value", this.getId()); //Para select de vue
 		return json;
 	}

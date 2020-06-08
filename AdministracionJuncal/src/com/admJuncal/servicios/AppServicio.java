@@ -14,6 +14,7 @@ import javax.servlet.http.HttpServletResponse;
 import org.json.simple.JSONObject;
 
 import com.admJuncal.edificios.Edificio;
+import com.admJuncal.edificios.MesLiquidacion;
 import com.admJuncal.edificios.Proveedor;
 import com.admJuncal.persistencia.BaseDatos;
 import com.admJuncal.transacciones.Transaccion;
@@ -84,9 +85,11 @@ public class AppServicio extends HttpServlet {
 		JSONObject json = new JSONObject();
 		JSONArray edificiosJSON = new JSONArray();
 		JSONArray proveedoresJSON = new JSONArray();
+		JSONArray mesesLiquidacionJSON = new JSONArray();
 		try {
 			edificiosJSON = obtenerEdificiosJSON();
 			proveedoresJSON = obtenerProveedoresJSON();
+			mesesLiquidacionJSON = obtenerMesesLiquidacion();
 		} catch (Exception e) {
 			status = 200;
 			mensaje = "Ha ocurrido un error al intentar iniciar el sistema";
@@ -96,12 +99,10 @@ public class AppServicio extends HttpServlet {
 		json.put("mensaje", mensaje);
 		json.put("edificios", edificiosJSON);
 		json.put("proveedores", proveedoresJSON);
+		json.put("meses", mesesLiquidacionJSON);
 		this.seandBack(json.toJSONString(), response);
 	}
-	
-	
-	
-	
+
 	private void login(HttpServletRequest request, HttpServletResponse response) throws SQLException {
 		int status = 0;
 		String mensaje = "";
@@ -168,6 +169,18 @@ public class AppServicio extends HttpServlet {
 		retorno.put("mensaje", mensaje);
 		retorno.put("edificio", edificio.toJSON());
 		this.seandBack(retorno.toJSONString(), response);
+	}
+	
+	private JSONArray obtenerMesesLiquidacion() {
+		Connection conn = null;
+		JSONArray retorno = new JSONArray();
+		try {
+			conn = BaseDatos.getConnection();
+			retorno =  MesLiquidacion.obtenerMesesLiquidacionJSON(conn);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return retorno;
 	}
 	
 	private void nuevaTransaccion(HttpServletRequest request, HttpServletResponse response) throws SQLException {

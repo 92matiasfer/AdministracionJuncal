@@ -559,3 +559,45 @@ body {
 	vertical-align: middle;	
 }
 
+.list-card-option {
+	display: flex;
+    flex-wrap: wrap;
+    position: relative;
+}
+
+.card-option {
+	width: 300px;
+	min-width: 300px;
+	height: 230px;
+    border: 2px solid #2196f3;
+    border-radius: 20px;
+    border-style: outset;
+    text-align: center;
+    padding: 10px;
+    margin: 10px 20px;
+    box-shadow: 10px 10px 5px 0px rgba(202,220,252,1);
+}
+
+.div-title-card {
+	background-color: #2196f3;
+	height: 40px;
+	display: flex;
+	margin-top: 2px;
+	align-items: center;
+    justify-content: center;
+    border-radius: 10px 10px 0px 0px;
+}
+
+.title-card {
+    color: white;
+    margin: 0;
+}
+
+/********************Formulario *************************/
+
+.fieldset-form-ingreso {
+	border-radius: 20px;
+    padding: 10px 25px;
+    border-color: #2196f3;
+}
+
