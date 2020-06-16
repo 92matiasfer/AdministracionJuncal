@@ -31,7 +31,29 @@ body {
 	display: flex;
 	justify-content: center;
 	align-items: center;
-	background-color: #f5f8ff;
+	background-color: #3498DB;
+}
+
+.login-form {
+	position: relative;
+	z-index: 1;
+  	background: #FFFFFF;
+ 	max-width: 360px;
+  	margin: 0 auto 100px;
+  	padding: 45px;
+  	text-align: center;
+  	box-shadow: 0 0 20px 0 rgba(0, 0, 0, 0.2), 0 5px 5px 0 rgba(0, 0, 0, 0.24);
+}
+
+.textbox-login .ui-textbox__input {
+	font-family: "Roboto", sans-serif;
+  	outline: 0;
+ 	background-color: rgb(232, 240, 254);
+  	width: 100%;
+  	border: 0;
+  	margin: 0 0 15px;
+  	padding: 15px;
+  	box-sizing: border-box;
 }
 
 .fieldset-login .ui-textbox__input {
@@ -50,6 +72,11 @@ body {
 	color: #2196f3;
 	margin-top: 0px;
 	font-size: 20px;
+}
+
+.button-login .ui-button{
+	width: 100%;
+	margin-bottom: 10px;
 }
 
 .title-login {
@@ -300,6 +327,8 @@ body {
     }
     .mui-page {
     	padding: 20px;
+    	padding-bottom: 60px;
+    	height: 100% !important;
     }
     .form-login {
     	width: 35% !important;
@@ -364,6 +393,11 @@ body {
 
 #mui-screen-page > .mui-scroll-wrapper {
 	height: 100%;	
+}
+
+mui-page {
+   	padding-bottom: 60px;
+   	height: 100% !important;
 }
 
 .mui-page-header {
@@ -521,7 +555,8 @@ body {
 	display: table;
 }
 .heading {
-	background-color: #e9f4fd;
+	background-color: #2196f3;
+	color: white;
 	display: table-row;
 	font-weight: bold;
 	padding: 0px 10px;
@@ -536,13 +571,39 @@ body {
 	background-color: #f3f3f3;
 }
 
+.row-cebra {
+	display: table-row;
+	padding: 0px 10px;
+}
+
+.row-cebra:nth-child(even) {
+    background-color: #fff;
+}
+
+
+.row-cebra:nth-child(odd) {
+    background-color: #f8f9fb;
+}
+
+.row-cebra:hover{
+	background-color: #f3f3f3;
+}
+
 .cell {
 	display: table-cell;
 	padding: 0px 10px;
 }
 
-.border {
+.border{
 	border: 1px solid #d7d9da; 
+}
+
+.border-button {
+	border-bottom: 1px solid #d7d9da; 
+}
+
+.border-white {
+	border: 1px solid white; 
 }
 
 .ui-menu-option:not(.is-divider):hover:not(.is-disabled), body[modality=keyboard] .ui-menu-option:not(.is-divider):focus {
@@ -575,7 +636,7 @@ body {
     text-align: center;
     padding: 10px;
     margin: 10px 20px;
-    box-shadow: 10px 10px 5px 0px rgba(202,220,252,1);
+    box-shadow: 0 0 20px 0 rgba(0, 0, 0, 0.2), 0 5px 5px 0 rgba(0, 0, 0, 0.24);
 }
 
 .div-title-card {
@@ -591,6 +652,11 @@ body {
 .title-card {
     color: white;
     margin: 0;
+}
+
+.radio-monto {
+	width: 186px;
+    margin: 0px auto;
 }
 
 /********************Formulario *************************/

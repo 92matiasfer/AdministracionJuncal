@@ -38,25 +38,29 @@
 				<div class="title-login">
 <!-- 					<h2>Administración Juncal</h2> -->
 				</div>
-				<div class="form-login">
-					<p>Ingreso al sistema</p>
-					<fieldset class="fieldset-login">
-						<ui-textbox
-							label="Usuario"
-							required
+				<div class="login-form">
+					<div class="textbox-login">
+						<ui-textbox 
+							placeholder="Usuario"
 							:invalid="login.invalidName"
 							error="Debe ingresar un nombre de usuario valido"
 							v-model="login.userName"	
 						></ui-textbox>
 						<ui-textbox
-							label="Password"
-							required
+							placeholder="Contraseña"
 							type="password"
 							:invalid="login.invalidPassword"
 							error="Debe ingresar una contraseña valida"
 							v-model="login.password"
 						></ui-textbox>
-						<div align="center" class="button-m">
+					</div>
+					<div align="center">
+						<div class="button-login"> 
+							<ui-button 
+								color="primary" 
+								@click="goLogin"
+								>Ingresar
+							</ui-button>
 							<ui-button 
 								class="bnt-secondary-blue"
 								type="secondary"
@@ -64,14 +68,45 @@
 								@click=""
 								>Registrarse
 							</ui-button>
-							<ui-button 
-								color="primary" 
-								@click="goLogin"
-								>Ingresar
-							</ui-button>
 						</div>
-					</fieldset>
+					</div>
 				</div>
+				
+				
+<!-- 				<div class="form-login"> -->
+<!-- 					<p>Ingreso al sistema</p> -->
+<!-- 					<fieldset class="fieldset-login"> -->
+<!-- 						<ui-textbox -->
+<!-- 							label="Usuario" -->
+<!-- 							required -->
+<!-- 							:invalid="login.invalidName" -->
+<!-- 							error="Debe ingresar un nombre de usuario valido" -->
+<!-- 							v-model="login.userName"	 -->
+<!-- 						></ui-textbox> -->
+<!-- 						<ui-textbox -->
+<!-- 							label="Password" -->
+<!-- 							required -->
+<!-- 							type="password" -->
+<!-- 							:invalid="login.invalidPassword" -->
+<!-- 							error="Debe ingresar una contraseña valida" -->
+<!-- 							v-model="login.password" -->
+<!-- 						></ui-textbox> -->
+<!-- 						<div align="center" class="button-m"> -->
+<!-- 							<ui-button  -->
+<!-- 								class="bnt-secondary-blue" -->
+<!-- 								type="secondary" -->
+<!-- 								color="primary"  -->
+<!-- 								@click="" -->
+<!-- 								>Registrarse -->
+<!-- 							</ui-button> -->
+<!-- 							<ui-button  -->
+<!-- 								color="primary"  -->
+<!-- 								@click="goLogin" -->
+<!-- 								>Ingresar -->
+<!-- 							</ui-button> -->
+<!-- 						</div> -->
+<!-- 					</fieldset> -->
+<!-- 				</div> -->
 			</div>
 			<div id="left-panel" v-show="showLeftPanel" class="mui-panel mui-left-panel">
 				<div class="mui-panel-header">
@@ -116,27 +151,29 @@
 				<!-- 			El resto va aqui -->
 					<div id="mui-viewport" class="mui-viewport">	
 						<div id="home-page" class="mui-page mui-scrollable">
-							<h3 slot="header">Edificios</h3>
+							<div slot="header">
+								<h3>Edificios</h3>
+							</div>
 							<div class="table table-emp">
 								<div class="heading">
-									<div class="cell border">
+									<div class="cell">
 										<p>Nombre</p>
 									</div>
-									<div class="cell border">
+									<div class="cell">
 										<p>Dirección</p>
 									</div>
-									<div class="cell border align-v" style="width: 6%;">
+									<div class="cell" style="width: 6%;">
 										<p>&nbsp;</p>
 									</div>
 								</div>
-								<div class="row" v-for="edificio in edificios" @click="verEdificio(edificio)" style="cursor: pointer;">
-									<div class="cell border">
+								<div class="row-cebra" v-for="edificio in edificios" @click="verEdificio(edificio)" style="cursor: pointer;">
+									<div class="cell border-button">
 										<p>{{edificio.nombre}}</p>
 									</div>
-									<div class="cell border">
+									<div class="cell border-button">
 										<p>{{edificio.direccion}}</p>
 									</div>
-									<div class="cell border" align="center">
+									<div class="cell border-button align-v" align="center">
 										<i class="material-icons">
 											keyboard_arrow_right										
 										</i>
@@ -219,6 +256,11 @@
 								                :options="edificio.unidades"
 								                v-model="nuevaTransaccion.unidad"
 								            ></ui-select>
+								             <ui-select
+								                label="Seleccionar mes"
+								                :options="mesesLiquidacion"
+								                v-model="nuevaTransaccion.mes"
+								            ></ui-select>
 											<ui-textbox
 												label="Monto"
 												v-model="nuevaTransaccion.monto"	
@@ -231,13 +273,10 @@
 												label="Fondo de reserva"
 												v-model="nuevaTransaccion.fondoReserva"	
 											></ui-textbox>
-								            <ui-select
-								                label="Seleccionr mes"
-								                :options="mesesLiquidacion"
-								                v-model="nuevaTransaccion.mes"
-								            ></ui-select>
 								             <ui-datepicker
 								                icon="events"
+								                orientation="landscape"
+								                :lang="calendarioEsp"
 								                picker-type="modal"
 								                v-model="nuevaTransaccion.fecha"
 								            	>Fecha
@@ -267,6 +306,7 @@
 										<fieldset class="fieldset-form-ingreso">
 											 <ui-select
 								                label="Seleccione un proveedor"
+								                has-search
 								                :options="proveedores"
 								                v-model="nuevaTransaccion.proveedor"
 								            ></ui-select>
@@ -305,6 +345,7 @@
 				            </ui-tabs>
 						</div>
 						<div id="detalle-edificio-page" class="mui-page">
+							<h3 slot="header">Ingreso de monto Anual</h3>
 							<fieldset class="fieldset-form-ingreso">
 								 <ui-select
 					                label="Seleccione un año"
@@ -315,14 +356,6 @@
 									label="Ingrese un monto"
 									v-model="nuevoAnioMonto.monto"
 								></ui-textbox>
-								<div align="center">
-									<ui-radio-group
-						                name="tipoDeMonto"
-						                :options="['Real', 'Estimado']"
-						                v-model="nuevoAnioMonto.tipoMonto"
-						            	>Seleccione el tipo de monto
-						            </ui-radio-group>
-					            </div>
 				            </fieldset>
 				            <div align="right" style="margin-top: 25px;">
 								<ui-button 

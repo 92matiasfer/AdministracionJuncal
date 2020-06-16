@@ -67,6 +67,8 @@ var vm = new Vue({
 		},
 		verEdificio: function(edificio){
 			mui.busy(true);
+			var fecha = new Date();
+			var fechaActual = fecha.getFullYear() + '-' + (fecha.getFullMonth() + 1) + '-' + fecha.getDate(); 
 			mui.ajax({
 				url: servicioURL,
 				type: 'GET',
@@ -77,6 +79,7 @@ var vm = new Vue({
 				success: function(data){
 					if(data.status == 0){
 						vm.edificio = data.edificio;
+						vm.fechaActual = fechaActual;
 						mui.viewport.showPage('edificio-page', 'SLIDE_UP');
 					} else {
 						alert(data.mensaje);

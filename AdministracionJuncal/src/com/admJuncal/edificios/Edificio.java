@@ -103,7 +103,7 @@ public class Edificio {
 		String sql = "";
 		ArrayList<Edificio> edificios = new ArrayList<Edificio>();
 		try {
-			sql = "SELECT * FROM edificio";
+			sql = "SELECT * FROM edificio ORDER BY nombreEdificio";
 			ps = conn.prepareStatement(sql);
 			res = ps.executeQuery();
 			while(res.next()) {

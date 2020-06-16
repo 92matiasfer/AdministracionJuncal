@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.sql.Connection;
 import java.sql.SQLException;
+import java.util.Date;
 
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
@@ -19,6 +20,7 @@ import com.admJuncal.edificios.Proveedor;
 import com.admJuncal.persistencia.BaseDatos;
 import com.admJuncal.transacciones.Transaccion;
 import com.admJuncal.usuarios.Usuario;
+import com.admJuncal.utilidades.FechaUtils;
 
 import org.json.simple.JSONArray;
 
@@ -156,18 +158,21 @@ public class AppServicio extends HttpServlet {
 		int status = 0;
 		int idEdificio = Integer.parseInt(request.getParameter("idEdificio"));
 		String mensaje = "";
+		String fechaActual = "";
 		JSONObject retorno = new JSONObject();
 		Edificio edificio = new Edificio();
 		Connection conn = null;
 		try {
 			conn = BaseDatos.getConnection();
 			edificio = Edificio.obtenerEdificio(idEdificio, conn);
+			fechaActual = FechaUtils.otenerFechaActual();
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
 		retorno.put("status", status);
 		retorno.put("mensaje", mensaje);
 		retorno.put("edificio", edificio.toJSON());
+		retorno.put("fechaActual", fechaActual);
 		this.seandBack(retorno.toJSONString(), response);
 	}
 	
