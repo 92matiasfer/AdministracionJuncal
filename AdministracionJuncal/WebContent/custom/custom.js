@@ -24,6 +24,8 @@ var vm = new Vue({
 		selectItemLeftPanel: function(option, item){
 			if(option.id == 1){
 				mui.viewport.showPage('home-page','SLIDE_UP');
+			} else if(option.id == 2){
+				mui.viewport.showPage('pagos-page','SLIDE_UP');
 			}
 			
 		},
