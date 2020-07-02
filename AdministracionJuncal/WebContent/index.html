@@ -181,7 +181,7 @@
 								</div>
 							</div>
 						</div>
-						<div id="edificio-page" class="mui-page">
+						<div id="edificio-page" class="mui-page mui-scrollable">
 							<h3 slot="header">{{edificio.nombre}}</h3>
 							<div class="list-card-option">
 								<div class="card-option">
@@ -192,6 +192,17 @@
 									<ui-button 
 										color="primary" 
 										@click="mostrarFormIngresoPago"
+										>Ingresar
+									</ui-button>
+								</div>
+								<div class="card-option">
+									<div class="div-title-card align-v">
+										<h4 class="title-card">Generar Liquidación</h4>
+									</div>
+									<p style="min-height: 43%;">Generar liquidación del mes seleccionado</p>
+									<ui-button 
+										color="primary" 
+										@click="mostrarFormLiquidacion"
 										>Ingresar
 									</ui-button>
 								</div>
@@ -242,7 +253,7 @@
 							</div>
 							
 						</div>
-						<div id="form-pagos-page" class="mui-page">
+						<div id="form-pagos-page" class="mui-page mui-scrollable">
 							<h3 slot="header">{{edificio.nombre}}</h3>
 							<ui-tabs fullwidth>
 				                <ui-tab>
@@ -254,25 +265,48 @@
 											<ui-select
 								                label="Seleccione una unidad"
 								                :options="edificio.unidades"
+								                @change="cargarMontos()"
 								                v-model="nuevaTransaccion.unidad"
 								            ></ui-select>
 								             <ui-select
 								                label="Seleccionar mes"
 								                :options="mesesLiquidacion"
-								                v-model="nuevaTransaccion.mes"
+								                v-model="nuevaTransaccion.mesLiquidacion"
 								            ></ui-select>
 											<ui-textbox
 												label="Monto"
+												placeholder="Ingrese el monto total realizado por el copropietario"
+												@blur="chequearMontoIngresado"
+												:invalid="nuevaTransaccion.invalidMonto"
+												:error="nuevaTransaccion.errorMonto"
 												v-model="nuevaTransaccion.monto"	
 											></ui-textbox>
-											<ui-textbox
-												label="Gastos comunes"
-												v-model="nuevaTransaccion.gastosComunes"	
-											></ui-textbox>
-											<ui-textbox
-												label="Fondo de reserva"
-												v-model="nuevaTransaccion.fondoReserva"	
-											></ui-textbox>
+											<div class="form-dos">											
+												<ui-textbox
+													class="col-md-6"
+													label="Gastos comunes"
+													v-model="nuevaTransaccion.gastosComunes"	
+												></ui-textbox>
+												<ui-textbox
+													label="Monto a pagar "
+													disabled
+													class="col-md-6 textbox-fondo-blue"
+													v-model="nuevaTransaccion.debePagarGC">												
+												</ui-textbox>
+											</div>
+											<div class="form-dos">				
+												<ui-textbox
+													class="col-md-6"
+													label="Fondo de reserva"
+													v-model="nuevaTransaccion.fondoReserva"	
+												></ui-textbox>
+												<ui-textbox
+													label="Monto a pagar "
+													disabled
+													class="col-md-6 textbox-fondo-blue"
+													v-model="nuevaTransaccion.debePagarFR">												
+												</ui-textbox>
+											</div>
 								             <ui-datepicker
 								                icon="events"
 								                orientation="landscape"
@@ -281,6 +315,10 @@
 								                v-model="nuevaTransaccion.fecha"
 								            	>Fecha
 											</ui-datepicker>
+											<ui-textbox
+												label="Obsevaciones"
+												v-model="nuevaTransaccion.observacion"
+											></ui-textbox>
 										</fieldset>
 										<div align="right" style="margin-top: 25px;">
 											<ui-button 
@@ -292,7 +330,7 @@
 											</ui-button>
 								            <ui-button 
 												color="primary" 
-												@click="guardarTransaccion()"
+												@click="guardarTransaccion(1)"
 												>Confirmar
 											</ui-button>
 										</div>
@@ -317,7 +355,7 @@
 								            <ui-select
 								                label="Seleccionr mes"
 								                :options="mesesLiquidacion"
-								                v-model="nuevaTransaccion.mes"
+								                v-model="nuevaTransaccion.mesLiquidacion"
 								            ></ui-select>
 								             <ui-datepicker
 								                icon="events"
@@ -325,6 +363,10 @@
 								                v-model="nuevaTransaccion.fecha"
 								            	>Fecha
 											</ui-datepicker>
+											<ui-textbox
+												label="Obsevaciones"
+												v-model="nuevaTransaccion.observacion"
+											></ui-textbox>
 										</fieldset>
 										<div align="right" style="margin-top: 25px;">
 											<ui-button 
@@ -336,7 +378,7 @@
 											</ui-button>
 								            <ui-button 
 												color="primary" 
-												@click="guardarTransaccion()"
+												@click="guardarTransaccion(2)"
 												>Confirmar
 											</ui-button>
 										</div>
@@ -344,7 +386,7 @@
 				                </ui-tab>
 				            </ui-tabs>
 						</div>
-						<div id="detalle-edificio-page" class="mui-page">
+						<div id="detalle-edificio-page" class="mui-page mui-scrollable">
 							<h3 slot="header">Ingreso de monto Anual</h3>
 							<fieldset class="fieldset-form-ingreso">
 								 <ui-select
@@ -372,11 +414,139 @@
 								</ui-button>
 							</div>
 						</div>
-						<div id="pagos-page" class="mui-page">
+						<div id="pagos-page" class="mui-page mui-scrollable">
+							<div slot="header">
+								<h3>Pagos</h3>
+							</div>
+							<fieldset class="fieldset-form-ingreso" style="margin-bottom: 20px;">
+								<div style="margin-top: 25px;">
+									<div class="form-dos">
+										<div class="col-md-6">													
+										     <ui-select
+										     	label="Edificio"
+								                :options="edificios"
+								                @select="cargarUnidadesSelect()"
+								                v-model="filtrosPagos.edificio"  
+								            ></ui-select>
+							            </div>
+							            <div class="col-md-6">	
+								            <ui-select
+												label="Unidad"
+												:disabled="filtrosPagos.edificio.id==0"
+								                :options="edificio.unidades"
+								                v-model="filtrosPagos.unidad"  
+								            ></ui-select>
+										</div>
+									</div>
+									<div class="form-dos">	
+										<div class="col-md-6">	
+											<ui-select
+												label="Tipo de pago"
+								                :options="tipoTransacciones"
+								                v-model="filtrosPagos.tipoTransacciones"  
+								            ></ui-select>
+							            </div>
+							            <div class="col-md-6">	
+								            <ui-select
+								            	label="Proveedor"
+								                :options="proveedores"
+								                v-model="filtrosPagos.proveedor"  
+								            ></ui-select>
+							            </div>
+									</div>
+									<div class="form-dos">	
+										<div class="col-md-6">	
+								             <ui-datepicker
+								                orientation="landscape"
+								                :lang="calendarioEsp"
+								                picker-type="modal"
+								                v-model="filtrosPagos.fechaInicio"
+								            	>Fecha Inicio
+											</ui-datepicker>
+										</div>
+										<div class="col-md-6">	
+											 <ui-datepicker
+								                orientation="landscape"
+								                :lang="calendarioEsp"
+								                picker-type="modal"
+								                v-model="filtrosPagos.fechaFin"
+								            	>Fecha Fin
+											</ui-datepicker>
+										</div>
+									</div>
+									<div align="right">
+										 <ui-button 
+							            	class="bnt-secondary-blue"
+											type="secondary"
+											color="primary" 
+											@click="limpiarFiltrosPagos()"
+											>Limpiar
+										</ui-button>
+										 <ui-button 
+											color="primary" 
+											@click="verTransacciones()"
+											>Buscar
+										</ui-button>
+									</div>
+								</div>
+							</fieldset>
+							<div class="table table-emp">
+								<div class="heading">
+									<div class="cell" style="width: 30%;">
+										<p>Edificio</p>
+									</div>
+									<div class="cell" v-if="filtrosPagos.tipoTransacciones.value==1">
+										<p>Unidad</p>
+									</div>
+									<div class="cell" v-if="filtrosPagos.tipoTransacciones.value==2">
+										<p>Proveedor</p>
+									</div>
+									<div class="cell">
+										<p>Monto</p>
+									</div>
+									<div class="cell">
+										<p>Fecha</p>
+									</div>
+									<div class="cell" style="width: 18%;">
+										<p>Número Factura</p>
+									</div>
+								</div>
+								<div class="row-cebra" v-for="transaccion in transacciones">
+									<div class="cell border-button">
+										<p>{{transaccion.edificio.nombre}}</p>
+									</div>
+									<div class="cell border-button" v-if="filtrosPagos.tipoTransacciones.value==1">
+										<p v-if="transaccion.idUnidad">{{transaccion.idUnidad.nroApartamento}}&nbsp;{{transaccion.idUnidad.tipoUnidad}}</p>
+									</div>
+									<div class="cell border-button" v-if="filtrosPagos.tipoTransacciones.value==2">
+										<p v-if="transaccion.proveedor">{{transaccion.proveedor.nombre}}</p>
+									</div>
+									<div class="cell border-button">
+										<p>{{transaccion.monto}}</p>
+									</div>
+									<div class="cell border-button">
+										<p>{{transaccion.fecha}}</p>
+									</div>
+									<div class="cell border-button">
+										<p>{{transaccion.nroFactura}}</p>
+									</div>
+								</div>
+							</div>
 						</div>
 					</div>
 				</div>
 			</div>	
+			<ui-modal ref="formulario-generar-liquidacion" title="Aligned top" align-top>
+                     <ui-select
+		                label="Seleccionr mes"
+		                :options="mesesLiquidacion"
+		                v-model="nuevaLiquidacion.mesLiquidacion"
+		            ></ui-select>
+                    <div slot="footer">
+                        <ui-button @click="closeModal('formulario-generar-liquidacion')">Close</ui-button>
+                         <ui-button @click="generarLiquidacion" color="primary">Generar</ui-button>
+                    </div>
+              </ui-modal>
 		</div>
 	</div>
 	<script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>

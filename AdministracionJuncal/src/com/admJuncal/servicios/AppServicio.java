@@ -64,8 +64,12 @@ public class AppServicio extends HttpServlet {
 				login(request, response);
 			} else if(comando.contains("obteneredificio")) {
 				obtenerEdificio(request, response);
-			} else if(comando.contains("nuevatransaccion")) {
+			} else if(comando.contains("nuevatransaccion")) { 
 				nuevaTransaccion(request, response);
+			} else if(comando.contains("generarliquidacion")) {
+				generarLiquidacion(request, response);
+			} else if(comando.contains("obtenertransaccion")) {
+				obtenerTransacciones(request, response);    //*****************
 			}
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -88,10 +92,12 @@ public class AppServicio extends HttpServlet {
 		JSONArray edificiosJSON = new JSONArray();
 		JSONArray proveedoresJSON = new JSONArray();
 		JSONArray mesesLiquidacionJSON = new JSONArray();
+		JSONArray transaccionesJSON = new JSONArray();
 		try {
 			edificiosJSON = obtenerEdificiosJSON();
 			proveedoresJSON = obtenerProveedoresJSON();
 			mesesLiquidacionJSON = obtenerMesesLiquidacion();
+			transaccionesJSON = obtenerTransaccionesJSON();
 		} catch (Exception e) {
 			status = 200;
 			mensaje = "Ha ocurrido un error al intentar iniciar el sistema";
@@ -99,6 +105,7 @@ public class AppServicio extends HttpServlet {
 		}
 		json.put("status", status);
 		json.put("mensaje", mensaje);
+		json.put("transacciones", transaccionesJSON);
 		json.put("edificios", edificiosJSON);
 		json.put("proveedores", proveedoresJSON);
 		json.put("meses", mesesLiquidacionJSON);
@@ -188,19 +195,29 @@ public class AppServicio extends HttpServlet {
 		return retorno;
 	}
 	
+
 	private void nuevaTransaccion(HttpServletRequest request, HttpServletResponse response) throws SQLException {
 		int status = 0;
+		int idUnidad = 0;
+		int idProveedor = 0;
+		int tipoTransaccion = Integer.parseInt(request.getParameter("tipoTransaccion"));
+		if(tipoTransaccion == 1) {
+			idUnidad = Integer.parseInt(request.getParameter("unidad"));
+		} else if(tipoTransaccion == 2) {
+			idProveedor = Integer.parseInt(request.getParameter("proveedor"));
+		}
 		int idEdificio = Integer.parseInt(request.getParameter("edificio"));
-		int idUnidad = Integer.parseInt(request.getParameter("unidad"));
-//		int idProveedor = Integer.parseInt(request.getParameter("proveedor"));
+		int mesLiquidacion = Integer.parseInt(request.getParameter("mesLiquidacion"));
 		double monto = Double.parseDouble(request.getParameter("monto"));
+		String nroFactura = request.getParameter("nroFactura");
+		String observacion = request.getParameter("observacion");
 		String fecha = request.getParameter("fecha");
 		String mensaje = "";
 		JSONObject retorno = new JSONObject();
 		Connection conn = null;
 		try {
 			conn = BaseDatos.getConnection();
-			Transaccion.guardar(idEdificio, idUnidad, monto, fecha, conn);
+			Transaccion.guardar(idEdificio, idUnidad, idProveedor, monto, fecha, mesLiquidacion, nroFactura, observacion, tipoTransaccion, conn);
 			mensaje = "Se ha registrado con exito la transaccion";
 		} catch (Exception e) {
 			status = 100;
@@ -212,5 +229,79 @@ public class AppServicio extends HttpServlet {
 		retorno.put("status", status);
 		retorno.put("mensaje", mensaje);
 		this.seandBack(retorno.toJSONString(), response);
+	}
+	
+	private void generarLiquidacion(HttpServletRequest request, HttpServletResponse response) throws SQLException {
+		int status = 0;
+		String mensaje = "";
+		JSONObject retorno = new JSONObject();
+		int mesLiquidacion = Integer.parseInt(request.getParameter("mesLiquidacion"));
+		int idEdificio = Integer.parseInt(request.getParameter("edificio"));
+		Edificio edificio = new Edificio();
+		Connection conn = null;
+		try {
+			conn = BaseDatos.getConnection();
+			edificio = Edificio.obtenerEdificio(idEdificio, conn);
+			edificio.calcularLiquidacion(mesLiquidacion, "2020", conn);
+			mensaje = "Se ha generado con exito la liquidacion";
+		} catch (Exception e) {
+			status = 100;
+			mensaje = "Lo sentimos, ha ocurrido un error al intentar generar la liquidacion";
+			e.printStackTrace();
+		} finally {
+			if(conn != null) conn.close();
+		}
+		retorno.put("status", status);
+		retorno.put("mensaje", mensaje);
+		this.seandBack(retorno.toJSONString(), response);
+	}
+	
+	private void obtenerTransacciones(HttpServletRequest request, HttpServletResponse response) throws SQLException {
+		int status = 0;
+		String mensaje = "";
+		JSONObject retorno = new JSONObject();
+		int edificio = (request.getParameter("idEdificio") == null) ? 0 : Integer.parseInt(request.getParameter("idEdificio"));
+		int tipoTransaccion = Integer.parseInt(request.getParameter("tipoTransaccion"));
+		int proveedor = (request.getParameter("proveedor") == null) ? 0 : Integer.parseInt(request.getParameter("proveedor"));
+		int unidad = (request.getParameter("unidad") == null) ? 0 : Integer.parseInt(request.getParameter("unidad"));
+		String fechaInicio = (request.getParameter("fechaInicio") == null) ? "" :request.getParameter("fechaInicio");
+		String fechaFin =  (request.getParameter("fechaFin") == null) ? "" :request.getParameter("fechaFin");
+		JSONArray transaccionesJSON = new JSONArray();
+		try {
+			transaccionesJSON = obtenerTransaccionesJSON(edificio, unidad, tipoTransaccion, proveedor, fechaInicio, fechaFin);
+		} catch (Exception e) {
+			status = 100;
+			mensaje = "Ha ocurrido un error al intentar hacer la transaccion";
+			e.printStackTrace();
+		}
+		retorno.put("status", status);
+		retorno.put("mensaje", mensaje);
+		retorno.put("transacciones", transaccionesJSON);
+		this.seandBack(retorno.toJSONString(), response);
+		
+	}
+	
+	private JSONArray obtenerTransaccionesJSON(int edificio, int unidad, int tipoTransaccion, int proveedor, String fechaInicio, String fechaFin) {
+		Connection conn = null;
+		JSONArray retorno = new JSONArray();
+		try {
+			conn = BaseDatos.getConnection();
+			retorno =  Transaccion.obtenerTransaccionesJSON(edificio, unidad, tipoTransaccion, proveedor, fechaInicio, fechaFin, conn);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return retorno;
+	}
+	
+	private JSONArray obtenerTransaccionesJSON() {
+		Connection conn = null;
+		JSONArray retorno = new JSONArray();
+		try {
+			conn = BaseDatos.getConnection();
+			retorno =  Transaccion.obtenerTransaccionesJSON(conn);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return retorno;
 	}
 }

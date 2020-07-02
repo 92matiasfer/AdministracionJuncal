@@ -3,6 +3,7 @@ package com.admJuncal.edificios;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.ArrayList;
 
 import org.json.simple.JSONArray;
@@ -18,7 +19,8 @@ public class Edificio {
 	private String direccion = "";
 	private double montoAnualTotal = 0;
 	private double recargo = 0;
-	private TipoMonto tipoMonto;
+	private TipoPago tipoPagoGC = null;
+	private TipoPago tipoPagoFR = null;
 	private ArrayList<Unidad> unidades = new ArrayList<Unidad>();
 	private ArrayList<Notificacion> notificaciones = new ArrayList<Notificacion>();
 	
@@ -52,12 +54,6 @@ public class Edificio {
 	public void setRecargo(double recargo) {
 		this.recargo = recargo;
 	}
-	public TipoMonto getTipoMonto() {
-		return tipoMonto;
-	}
-	public void setTipoMonto(TipoMonto tipoMonto) {
-		this.tipoMonto = tipoMonto;
-	}
 	public ArrayList<Unidad> getUnidades() {
 		return unidades;
 	}
@@ -70,19 +66,33 @@ public class Edificio {
 	public void setNotificaciones(ArrayList<Notificacion> notificaciones) {
 		this.notificaciones = notificaciones;
 	}
+	public TipoPago getTipoPagoGC() {
+		return tipoPagoGC;
+	}
+	public void setTipoPagoGC(TipoPago tipoPagoGC) {
+		this.tipoPagoGC = tipoPagoGC;
+	}
+	public TipoPago getTipoPagoFR() {
+		return tipoPagoFR;
+	}
+	public void setTipoPagoFR(TipoPago tipoPagoFR) {
+		this.tipoPagoFR = tipoPagoFR;
+	}
 	
 	public Edificio() {
 		super();
 	}
-	public Edificio(int id, String nombre, String direccion, double montoAnualTotal, double recargo, TipoMonto tipoMonto,
-			ArrayList<Unidad> unidades, ArrayList<Notificacion> notificaciones) {
+	public Edificio(int id, String nombre, String direccion, double montoAnualTotal, double recargo,
+			TipoPago tipoPagoGC, TipoPago tipoPagoFR, ArrayList<Unidad> unidades,
+			ArrayList<Notificacion> notificaciones) {
 		super();
 		this.id = id;
 		this.nombre = nombre;
 		this.direccion = direccion;
 		this.montoAnualTotal = montoAnualTotal;
 		this.recargo = recargo;
-		this.tipoMonto = tipoMonto;
+		this.tipoPagoGC = tipoPagoGC;
+		this.tipoPagoFR = tipoPagoFR;
 		this.unidades = unidades;
 		this.notificaciones = notificaciones;
 	}
@@ -119,15 +129,6 @@ public class Edificio {
 		return edificios;
 	}
 	
-	public Object toJSON() {
-		JSONObject json = new JSONObject();
-		json.put("id", this.getId());
-		json.put("nombre", this.getNombre());
-		json.put("direccion", this.getDireccion());
-		json.put("unidades", this.getUnidadesJSON());
-		return json;
-	}
-	
 	public static Edificio obtenerEdificio(int idEdificio, Connection conn) {
 		PreparedStatement ps = null;
 		ResultSet res = null;
@@ -143,6 +144,8 @@ public class Edificio {
 				e.setNombre(res.getString("nombreEdificio"));
 				e.setDireccion(res.getString("direccionEdificio"));
 				e.setUnidades(Unidad.obtenerUnidades(idEdificio, conn));
+				e.setTipoPagoFR(TipoPago.obtenerTipoPago(res.getInt("tipoPagoFR"), conn));
+				e.setTipoPagoGC(TipoPago.obtenerTipoPago(res.getInt("tipoPagoGC"), conn));
 			}
 		} catch (Exception ex) {
 			ex.printStackTrace();
@@ -156,6 +159,127 @@ public class Edificio {
 			unidadesJSON.add(u.toJSON());
 		}
 		return unidadesJSON;
+	}
+	
+	
+	public void calcularLiquidacion(int mesLiquidacion, String anio, Connection conn) throws SQLException {
+		PreparedStatement ps = null;
+		ResultSet res = null;
+		String sql = "";
+		double montoFR = 0;
+		double montoGC = 0;
+		double montoFRAnterior = 0;
+		double montoGCAnterior = 0;
+		ArrayList<Unidad> unidades = new ArrayList<Unidad>();
+		try {
+			conn.setAutoCommit(false);
+			
+//			Obtengo los saldos del mes anterior
+			sql = "SELECT saldoAnteriorGC, saldoAnteriorFR FROM mesliquidacion WHERE idMesLiquidacion = ?";
+			ps = conn.prepareStatement(sql);
+			ps.setInt(1, mesLiquidacion);
+			res = ps.executeQuery();
+			while(res.next()) {
+				montoFRAnterior = res.getDouble("saldoAnteriorFR");
+				montoGCAnterior = res.getDouble("saldoAnteriorGC");
+			}
+			
+			unidades = Unidad.obtenerUnidades(this.getId(), conn);
+			if(this.getTipoPagoFR().getId() == 1) {
+				sql = "SELECT montoFondoReserva FROM montosfijados WHERE idEdificio = ? AND anio = ?";
+				ps = conn.prepareStatement(sql);
+				ps.setInt(1, this.getId());
+				ps.setString(2, anio);
+				res = ps.executeQuery();
+				while(res.next()) {
+					montoFR = res.getDouble("montoFondoReserva");
+				}
+				for(Unidad u:unidades) {
+					if( u.getHablitadoPago() == 1 && (u.getTipoUnidad().equalsIgnoreCase("P") || u.getTipoUnidad().equalsIgnoreCase("A"))) {
+						sql = "SELECT * FROM unidadmesliquidacion WHERE idUnidad = ? AND idMesLiquidacion = ?";
+						ps = conn.prepareStatement(sql);
+						ps.setInt(1, u.getId());
+						ps.setInt(2, mesLiquidacion);
+						res = ps.executeQuery();
+						if(res.next()) {
+							sql = "UPDATE unidadmesliquidacion SET montoFondoReserva = ? WHERE idUnidad = ? AND idMesLiquidacion = ?";
+							ps = conn.prepareStatement(sql);
+							double montoFRUnidad = montoFR * u.getCoeficiente();
+							ps.setDouble(1, montoFRUnidad);
+							ps.setInt(2, u.getId());
+							ps.setInt(3, mesLiquidacion);
+							ps.executeUpdate();
+						} else {
+							sql = "INSERT INTO unidadmesliquidacion(idUnidad, idMesLiquidacion, montoFondoReserva) VALUES (?, ?, ?)";
+							ps = conn.prepareStatement(sql);
+							ps.setInt(1, u.getId());
+							ps.setInt(2, mesLiquidacion);
+							double montoFRUnidad = montoFR * u.getCoeficiente();
+							ps.setDouble(3, montoFRUnidad);
+							ps.executeUpdate();
+						}
+					}
+				}
+			}
+			if(this.getTipoPagoGC().getId() == 2) {
+				sql = "SELECT SUM(monto) AS totalGC FROM transaccion WHERE idEdificio = ? AND idTipoTransaccion = ? AND idMesLiquidacion = ?";
+				ps = conn.prepareStatement(sql);
+				ps.setInt(1, this.getId());
+				ps.setInt(2, 2);
+				ps.setInt(3, mesLiquidacion);
+				res = ps.executeQuery();
+				while(res.next()) {
+					montoGC = res.getDouble("totalGC");
+				}
+				for(Unidad u:unidades) {
+					if(u.getHablitadoPago() == 1 && (u.getTipoUnidad().equalsIgnoreCase("I") || u.getTipoUnidad().equalsIgnoreCase("A"))) {
+						sql = "SELECT * FROM unidadmesliquidacion WHERE idUnidad = ? AND idMesLiquidacion = ?";
+						ps = conn.prepareStatement(sql);
+						ps.setInt(1, u.getId());
+						ps.setInt(2, mesLiquidacion);
+						res = ps.executeQuery();
+						if(res.next()) {
+							sql = "UPDATE unidadmesliquidacion SET montoGastosComunes = ? WHERE idUnidad = ? AND idMesLiquidacion = ?";
+							ps = conn.prepareStatement(sql);
+							double montoGCUnidad = montoGC * u.getCoeficiente();
+							ps.setDouble(1, montoGCUnidad);
+							ps.setInt(2, u.getId());
+							ps.setInt(3, mesLiquidacion);
+							ps.executeUpdate();
+						} else {
+							sql = "INSERT INTO unidadmesliquidacion (idUnidad, idMesLiquidacion, montoGastosComunes) VALUES (?, ?, ?)";
+							ps = conn.prepareStatement(sql);
+							ps.setInt(1, u.getId());
+							ps.setInt(2, mesLiquidacion);
+							double montoGCUnidad = montoGC * u.getCoeficiente();
+							ps.setDouble(3, montoGCUnidad);
+							ps.executeUpdate();
+						}
+					}
+				}
+			}
+			
+			conn.commit();
+		} catch (Exception e) {
+			if(conn != null) conn.rollback();
+			e.printStackTrace();
+		} finally {
+			if(ps != null) ps.close();
+			if(res != null) res.close();
+			conn.setAutoCommit(true);
+		}
+	}
+	
+	
+	public Object toJSON() {
+		JSONObject json = new JSONObject();
+		json.put("id", this.getId());
+		json.put("nombre", this.getNombre());
+		json.put("direccion", this.getDireccion());
+		json.put("unidades", this.getUnidadesJSON());
+		json.put("label", this.getNombre());
+		json.put("value", this.getId());
+		return json;
 	}
 	
 }

@@ -341,6 +341,11 @@ body {
 /*     	margin: 0px 2%; */
     	width: 49% !important;
     }
+    .col-md-6 {
+		flex: 0 0 50% !important;
+		margin: 0 2% 16px 1% !important;
+		max-width: 47% !important;
+	}
 }
 
 @font-face {
@@ -659,6 +664,24 @@ mui-page {
     margin: 0px auto;
 }
 
+.form-dos {
+	display: -ms-flexbox;
+	display: flex;
+	-ms-flex-wrap: wrap;
+	flex-wrap: wrap;
+	margin-right: -5px;
+	margin-left: -5px;
+}
+
+.col-md-6 {
+	flex: 0 0 98%;
+	margin: 0 0 16px 0;
+}
+
+.textbox-fondo-blue .ui-textbox__input{
+	background-color: #d5e0fd;
+}
+
 /********************Formulario *************************/
 
 .fieldset-form-ingreso {
@@ -666,4 +689,4 @@ mui-page {
     padding: 10px 25px;
     border-color: #2196f3;
 }
-
+	

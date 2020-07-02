@@ -55,20 +55,81 @@ var globalDataVue = {
 		direccion: '',
 		unidades: []
 	},
+	transacciones: [
+		{
+			edificio: {
+				
+			},
+			unidad: {
+				nroApartamento: '',
+				tipoUnidad: ''
+			},
+			proveedor: {
+				nombre: ''
+			},
+			monto: '',
+			fecha: '',
+			nroFactura: ''
+		}
+	],
 	nuevaTransaccion: {
 		monto: '',
+		invalidMonto: false,
+		errorMonto: '',
 		gastosComunes: '',
 		fondoReserva: '',
+		saldoAnterior: '',
 		fecha: null,
+		nroFactura: '',
 		unidad:{
 			
 		},
 		proveedor: {
 			
 		},
-		mes: {
+		mesLiquidacion: {
 			
+		},
+		observacion: '',
+		debePagarGC: '',
+		debePagarFR: ''
+	},
+	filtrosPagos:{
+		edificio: {
+			id: 0,
+			nombre: '',
+			direccion: '',
+			unidades: []
+		},
+		proveedor:{
+			id: 0,
+			nombre: '',
+			descripcion: '',
+			rut: ''
+		},
+		tipoTransacciones: {
+			label: 'copropietario',
+			value: 1,
+		},
+		fechaInicio: null,
+		fechaFin: null,
+		unidad: {
+			value: 0
 		}
+		
+	},
+	tipoTransacciones: [
+		{
+			label: 'copropietario',
+			value: 1,
+		},
+		{
+			label: 'proveedor',
+			value: 2
+		}
+	],
+	nuevaLiquidacion: {
+		mesLiquidacion: ''
 	},
 	nuevoAnioMonto: {
 		anio: '',

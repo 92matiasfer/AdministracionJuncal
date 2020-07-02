@@ -29,6 +29,12 @@ var vm = new Vue({
 			}
 			
 		},
+		openModal(ref){
+			this.$refs[ref].open();
+		},
+		closeModal(ref){
+			this.$refs[ref].close();
+		},
 		goLogin: function(){
 			var me = this;
 			mui.busy(true);
@@ -69,8 +75,8 @@ var vm = new Vue({
 		},
 		verEdificio: function(edificio){
 			mui.busy(true);
-			var fecha = new Date();
-			var fechaActual = fecha.getFullYear() + '-' + (fecha.getFullMonth() + 1) + '-' + fecha.getDate(); 
+//			var fecha = new Date();
+//			var fechaActual = fecha.getFullYear() + '-' + (fecha.getFullMonth() + 1) + '-' + fecha.getDate(); 
 			mui.ajax({
 				url: servicioURL,
 				type: 'GET',
@@ -81,7 +87,7 @@ var vm = new Vue({
 				success: function(data){
 					if(data.status == 0){
 						vm.edificio = data.edificio;
-						vm.fechaActual = fechaActual;
+//						vm.fechaActual = fechaActual;
 						mui.viewport.showPage('edificio-page', 'SLIDE_UP');
 					} else {
 						alert(data.mensaje);
@@ -94,10 +100,167 @@ var vm = new Vue({
 				}
 			});
 		},
+		verTransacciones: function(){
+			var fechaInicio = '';
+			var fechaFin = '';
+			if(vm.filtrosPagos.fechaInicio != null){
+				var mes = '';
+				if((vm.filtrosPagos.fechaInicio.getMonth() + 1) < 10) {
+					mes = '0' + (vm.filtrosPagos.fechaInicio.getMonth() + 1);
+				} else {
+					mes = vm.filtrosPagos.fechaInicio.getMonth() + 1;
+				}
+				fechaInicio = vm.filtrosPagos.fechaInicio.getYear() + '-' + mes + '-' + vm.filtrosPagos.fechaInicio.getDay();
+			}
+			if(vm.filtrosPagos.fechaFin != null){
+				var mes = '';
+				if((vm.filtrosPagos.fechaFin.getMonth() + 1) < 10) {
+					mes = '0' + (vm.filtrosPagos.fechaFin.getMonth() + 1);
+				} else {
+					mes = vm.filtrosPagos.fechaFin.getMonth() + 1;
+				}
+				fechaFin = vm.filtrosPagos.fechaFin.getYear() + '-' + mes + '-' + vm.filtrosPagos.fechaFin.getDay();
+			}
+			mui.busy(true);
+			mui.ajax({
+				url: servicioURL,
+				type: 'GET',
+				data: {
+					comando: 'obtenertransaccion',
+					idEdificio: vm.filtrosPagos.edificio.value,
+					proveedor: vm.filtrosPagos.proveedor.value,
+					tipoTransaccion: vm.filtrosPagos.tipoTransacciones.value,
+					unidad: vm.filtrosPagos.unidad.value,
+					fechaInicio: fechaInicio,
+					fechaFin: fechaFin
+				},
+				success: function(data){
+					if(data.status == 0){
+						vm.transacciones = data.transacciones;
+					} else {
+						alert(data.mensaje);
+					}
+					mui.busy(false);
+				},
+				error: function(err,status, error){
+					mui.busy(false);
+					alert('Error al intentar comunicarse con el servidor');
+				}
+			});
+		},
+		limpiarFiltrosPagos: function(){
+			vm.filtrosPagos = {
+				edificio : {
+					id : 0,
+					nombre : '',
+					direccion : '',
+					unidades : []  
+				},
+				proveedor:{
+					id : 0,
+					nombre : '',
+					descripcion : '',
+					rut : ''
+				},
+				tipoTransacciones : {
+						label : '',
+						value : 0
+				}		
+			}
+		},
 		mostrarFormIngresoPago: function(){
 			mui.viewport.showPage('form-pagos-page', 'SLIDE_UP');
 		},
-		guardarTransaccion: function(){
+		mostrarFormLiquidacion: function(){
+			this.openModal('formulario-generar-liquidacion');	
+		},
+		cargarMontos: function(){
+			unidad = vm.nuevaTransaccion.unidad.value;
+			for(var i = 0; i < vm.edificio.unidades.length; i++){
+				if(vm.edificio.unidades[i].id == unidad){
+					vm.nuevaTransaccion.debePagarGC = vm.edificio.unidades[i].montoGC;
+					vm.nuevaTransaccion.debePagarFR = vm.edificio.unidades[i].montoFR;
+					vm.nuevaTransaccion.saldoAnterior = vm.edificio.unidades[i].saldoAnterior;
+				}
+			}
+		},
+		chequearMontoIngresado: function(){
+			vm.nuevaTransaccion.invalidMonto = false;
+			var totalaPagar = 0;
+			var apagarGC = 0;
+			var apagarFR = 0;
+			var resto = 0;
+			unidad = vm.nuevaTransaccion.unidad.value;
+			for(var i = 0; i < vm.edificio.unidades.length; i++){
+				if(vm.edificio.unidades[i].id == unidad){
+					apagarGC = vm.edificio.unidades[i].montoGC;
+					apagarFR = vm.edificio.unidades[i].montoFR;
+					totalaPagar = vm.edificio.unidades[i].montoGC + vm.edificio.unidades[i].montoFR;
+				}
+			}
+			if(vm.nuevaTransaccion.monto < totalaPagar){
+				vm.nuevaTransaccion.invalidMonto = true;
+				vm.nuevaTransaccion.errorMonto = 'Avertencia! El monto ingresado es menor al que se debe pagar.';
+			} else {
+				vm.nuevaTransaccion.gastosComunes = apagarGC;
+				vm.nuevaTransaccion.fondoReserva = apagarFR;
+				if(vm.nuevaTransaccion.monto > totalaPagar){
+					resto = vm.nuevaTransaccion.monto - (apagarGC + apagarFR);
+					vm.nuevaTransaccion.invalidMonto = true;
+					vm.nuevaTransaccion.errorMonto = 'El monto ingresado es mayor al que se debe pagar. El resto de $' + resto + ' quedara como saldo de la unidad.';
+				}
+			}
+		},
+		cargarUnidadesSelect: function(){
+			mui.busy(true);
+			mui.ajax({
+				url: servicioURL,
+				type: 'GET',
+				data: {
+					comando: 'obteneredificio',
+					idEdificio: vm.filtrosPagos.edificio.value
+				},
+				success: function(data){
+					if(data.status == 0){
+						vm.edificio = data.edificio;
+					} else {
+						alert(data.mensaje);
+					}
+					mui.busy(false);
+				},
+				error: function(err,status, error){
+					mui.busy(false);
+					alert('Error al intentar comunicarse con el servidor');
+				}
+			});
+		},
+		generarLiquidacion: function(){
+			var me = this;
+			mui.busy(true);
+			mui.ajax({
+				url: servicioURL,
+				type: 'GET',
+				data: {
+					comando: 'generarliquidacion',
+					edificio: vm.edificio.id,
+					mesLiquidacion: vm.nuevaLiquidacion.mesLiquidacion.value
+				},
+				success: function(data){
+					if(data.status == 0){
+						me.closeModal('formulario-generar-liquidacion');
+						alert(data.mensaje);
+					} else {
+						alert(data.mensaje);
+					}
+					mui.busy(false);
+				},
+				error: function(err,status, error){
+					mui.busy(false);
+					alert('Error al intentar comunicarse con el servidor');
+				}				
+			})
+		},
+		guardarTransaccion: function(tipoTransaccion){
 			var me = this;
 			mui.busy(true);
 			var fecha = '';
@@ -111,6 +274,10 @@ var vm = new Vue({
 					edificio: vm.edificio.id,
 					proveedor: vm.nuevaTransaccion.proveedor.value,
 					unidad: vm.nuevaTransaccion.unidad.value,
+					mesLiquidacion: vm.nuevaTransaccion.mesLiquidacion.value,
+					observacion: vm.nuevaTransaccion.observacion,
+					tipoTransaccion: tipoTransaccion,
+					nroFactura: vm.nuevaTransaccion.nroFactura,
 					fecha: fecha
 				},
 				success: function(data){
@@ -501,6 +668,7 @@ function iniciarSistema(){
 			if(data.status==0){
 				vm.proveedores = data.proveedores;
 				vm.edificios = data.edificios;
+				vm.transacciones = data.transacciones;
 				vm.mesesLiquidacion = data.meses;
 				mui.screen.showPage('mui-screen-page' , 'NONE');
 				mui.busy(false);

@@ -10,6 +10,7 @@ import java.util.ArrayList;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 
+import com.admJuncal.codigueras.Codiguera;
 import com.admJuncal.persistencia.BaseDatos;
 
 public class Proveedor {
@@ -91,7 +92,18 @@ public class Proveedor {
 		return proveedores;
 	}
 	
-	private Object toJSON() {
+	public static Proveedor obtenerProveedor(int idProveedor, Connection conn) throws SQLException {
+		Proveedor proveedor = null;
+		for(Proveedor p:Codiguera.obtenerProveedores(conn)) {
+			if(p.getId() == idProveedor) {
+				proveedor = p;
+				break;
+			}
+		}
+		return proveedor;
+	}
+	
+	public Object toJSON() {
 		JSONObject json = new JSONObject();
 		json.put("id", this.getId());
 		json.put("nombre", this.getNombre());
@@ -101,6 +113,7 @@ public class Proveedor {
 		json.put("value", this.getId()); //Para select
 		return json;
 	}
+	
 	
 	
 }
