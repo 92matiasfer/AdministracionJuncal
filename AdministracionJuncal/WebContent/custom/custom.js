@@ -26,6 +26,8 @@ var vm = new Vue({
 				mui.viewport.showPage('home-page','SLIDE_UP');
 			} else if(option.id == 2){
 				mui.viewport.showPage('pagos-page','SLIDE_UP');
+			} else if(option.id == 6) {
+				mui.viewport.shoePage('contacto-page','SLIDE_UP')
 			}
 			
 		},
@@ -381,8 +383,8 @@ function installEvents() {
 	    },
 	    {
 	        id: 6,
-	        label: 'Avisos',
-	        icon: 'report_problem',
+	        label: 'Contacto',
+	        icon: 'sms',
 	    }
 	];
 	
