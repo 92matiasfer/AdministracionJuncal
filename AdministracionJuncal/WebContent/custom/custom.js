@@ -121,6 +121,14 @@ var vm = new Vue({
 				}
 				fechaFin = vm.filtrosPagos.fechaFin.getYear() + '-' + mes + '-' + vm.filtrosPagos.fechaFin.getDay();
 			}
+			if(vm.filtrosPagos.unidad.value > 0){
+				vm.tablaTransacciones.unidad = true;
+				vm.tablaTransacciones.proveedor = false;
+			}
+			if(vm.filtrosPagos.proveedor.value > 0){
+				vm.tablaTransacciones.proveedor = true;
+				vm.tablaTransacciones.unidad = false;
+			}
 			mui.busy(true);
 			mui.ajax({
 				url: servicioURL,
@@ -136,7 +144,12 @@ var vm = new Vue({
 				},
 				success: function(data){
 					if(data.status == 0){
-						vm.transacciones = data.transacciones;
+						if(data.transacciones.length > 0){
+							vm.existenTransacciones = true;
+							vm.transacciones = data.transacciones;
+						} else {
+							vm.existenTransacciones = true;
+						}
 					} else {
 						alert(data.mensaje);
 					}
@@ -668,7 +681,7 @@ function iniciarSistema(){
 			if(data.status==0){
 				vm.proveedores = data.proveedores;
 				vm.edificios = data.edificios;
-				vm.transacciones = data.transacciones;
+//				vm.transacciones = data.transacciones;
 				vm.mesesLiquidacion = data.meses;
 				mui.screen.showPage('mui-screen-page' , 'NONE');
 				mui.busy(false);

@@ -55,6 +55,11 @@ var globalDataVue = {
 		direccion: '',
 		unidades: []
 	},
+	tablaTransacciones: {
+		unidad: false,
+		proveedor: false
+	},
+	existenTransacciones: false,
 	transacciones: [
 		{
 			edificio: {

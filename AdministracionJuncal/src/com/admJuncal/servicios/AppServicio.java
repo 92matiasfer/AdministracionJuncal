@@ -97,7 +97,7 @@ public class AppServicio extends HttpServlet {
 			edificiosJSON = obtenerEdificiosJSON();
 			proveedoresJSON = obtenerProveedoresJSON();
 			mesesLiquidacionJSON = obtenerMesesLiquidacion();
-			transaccionesJSON = obtenerTransaccionesJSON();
+//			transaccionesJSON = obtenerTransaccionesJSON();
 		} catch (Exception e) {
 			status = 200;
 			mensaje = "Ha ocurrido un error al intentar iniciar el sistema";
@@ -105,7 +105,7 @@ public class AppServicio extends HttpServlet {
 		}
 		json.put("status", status);
 		json.put("mensaje", mensaje);
-		json.put("transacciones", transaccionesJSON);
+//		json.put("transacciones", transaccionesJSON);
 		json.put("edificios", edificiosJSON);
 		json.put("proveedores", proveedoresJSON);
 		json.put("meses", mesesLiquidacionJSON);

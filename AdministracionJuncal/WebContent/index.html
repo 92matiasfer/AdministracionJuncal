@@ -184,71 +184,95 @@
 						<div id="edificio-page" class="mui-page mui-scrollable">
 							<h3 slot="header">{{edificio.nombre}}</h3>
 							<div class="list-card-option">
-								<div class="card-option">
-									<div class="div-title-card align-v">
-										<h4 class="title-card">Ingresar Pago</h4>
+								<div class="card-option-aux">
+									<div class="div-title-card-aux align-v">
+										<h4 class="title-card-aux">Ingresar Pago</h4>
 									</div>	
-									<p style="min-height: 43%;">Ingreso de pagos a proveedores o pagos por concepto de gastos comunes o fondo de reserva</p>
-									<ui-button 
-										color="primary" 
-										@click="mostrarFormIngresoPago"
-										>Ingresar
-									</ui-button>
+									<div class=card-contenido>
+										<p style="min-height: 43%;">Ingreso de pagos a proveedores o pagos por concepto de gastos comunes o fondo de reserva</p>
+									</div>	
+									<div class="button-card" style="cursor: pointer;">
+										<ui-button 
+											color="primary" 
+											@click="mostrarFormIngresoPago"
+											>Ingresar
+										</ui-button>
+									</div>
 								</div>
-								<div class="card-option">
-									<div class="div-title-card align-v">
+								<div class="card-option-aux">
+									<div class="div-title-card-aux align-v">
 										<h4 class="title-card">Generar Liquidación</h4>
 									</div>
-									<p style="min-height: 43%;">Generar liquidación del mes seleccionado</p>
-									<ui-button 
-										color="primary" 
-										@click="mostrarFormLiquidacion"
-										>Ingresar
-									</ui-button>
+									<div class=card-contenido>
+										<p style="min-height: 43%;">Generar liquidación del mes seleccionado</p>
+									</div>
+									<div class="button-card" style="cursor: pointer;">
+										<ui-button 
+											color="primary" 
+											@click="mostrarFormLiquidacion"
+											>Ingresar
+										</ui-button>
+									</div>
 								</div>
-								<div class="card-option">
-									<div class="div-title-card align-v">
+								<div class="card-option-aux">
+									<div class="div-title-card-aux align-v">
 										<h4 class="title-card">Estado de cuenta</h4>
 									</div>
-									<p style="min-height: 43%;">Detalle del estado de cuenta del mes corriente</p>
-									<ui-button 
-										color="primary" 
-										@click=""
-										>Ingresar
-									</ui-button>
+									<div class=card-contenido>
+										<p style="min-height: 43%;">Detalle del estado de cuenta del mes corriente</p>
+									</div>
+									<div class="button-card" style="cursor: pointer;">
+										<ui-button 
+											color="primary" 
+											@click=""
+											>Ingresar
+										</ui-button>
+									</div>
 								</div>
-								<div class="card-option">
-									<div class="div-title-card align-v">
+								<div class="card-option-aux">
+									<div class="div-title-card-aux align-v">
 										<h4 class="title-card">Copropietarios</h4>
 									</div>
-									<p style="min-height: 43%;">Listado de los copropietarios</p>
-									<ui-button 
-										color="primary" 
-										@click=""
-										>Ingresar
-									</ui-button>
+									<div class=card-contenido>
+										<p style="min-height: 43%;">Listado de los copropietarios</p>
+									</div>
+									<div class="button-card" style="cursor: pointer;">
+										<ui-button 
+											color="primary" 
+											@click=""
+											>Ingresar
+										</ui-button>
+									</div>
 								</div>
-								<div class="card-option">
-									<div class="div-title-card align-v">
+								<div class="card-option-aux">
+									<div class="div-title-card-aux align-v">
 										<h4 class="title-card">Notificaciones</h4>
 									</div>
-									<p style="min-height: 43%;">Avisos de reparaciones, reuniones u otros avisos de interes</p>
-									<ui-button 
-										color="primary" 
-										@click=""
-										>Ingresar
-									</ui-button>
+									<div class=card-contenido>
+										<p style="min-height: 43%;">Avisos de reparaciones, reuniones u otros avisos de interes</p>
+									</div>
+									<div class="button-card" style="cursor: pointer;">
+										<ui-button 
+											color="primary" 
+											@click=""
+											>Ingresar
+										</ui-button>
+									</div>
 								</div>
-								<div class="card-option">
-									<div class="div-title-card align-v">
+								<div class="card-option-aux">
+									<div class="div-title-card-aux align-v">
 										<h4 class="title-card">Detalle</h4>
 									</div>
-									<p style="min-height: 43%;">Detalle y edición de la informanción asociada al edificio seleccionado</p>
-									<ui-button 
-										color="primary" 
-										@click="mostrarDetalle"
-										>Ingresar
-									</ui-button>
+									<div class=card-contenido>
+										<p style="min-height: 43%;">Detalle y edición de la informanción asociada al edificio seleccionado</p>
+									</div>
+									<div class="button-card" style="cursor: pointer;">
+										<ui-button 
+											color="primary" 
+											@click="mostrarDetalle"
+											>Ingresar
+										</ui-button>
+									</div>
 								</div>
 							</div>
 							
@@ -490,15 +514,15 @@
 									</div>
 								</div>
 							</fieldset>
-							<div class="table table-emp">
+							<div class="table table-emp" v-if="existenTransacciones">
 								<div class="heading">
 									<div class="cell" style="width: 30%;">
 										<p>Edificio</p>
 									</div>
-									<div class="cell" v-if="filtrosPagos.tipoTransacciones.value==1">
+									<div class="cell" v-if="tablaTransacciones.unidad">
 										<p>Unidad</p>
 									</div>
-									<div class="cell" v-if="filtrosPagos.tipoTransacciones.value==2">
+									<div class="cell" v-if="tablaTransacciones.proveedor">
 										<p>Proveedor</p>
 									</div>
 									<div class="cell">
@@ -515,10 +539,10 @@
 									<div class="cell border-button">
 										<p>{{transaccion.edificio.nombre}}</p>
 									</div>
-									<div class="cell border-button" v-if="filtrosPagos.tipoTransacciones.value==1">
+									<div class="cell border-button" v-if="tablaTransacciones.unidad">
 										<p v-if="transaccion.idUnidad">{{transaccion.idUnidad.nroApartamento}}&nbsp;{{transaccion.idUnidad.tipoUnidad}}</p>
 									</div>
-									<div class="cell border-button" v-if="filtrosPagos.tipoTransacciones.value==2">
+									<div class="cell border-button" v-if="tablaTransacciones.proveedor">
 										<p v-if="transaccion.proveedor">{{transaccion.proveedor.nombre}}</p>
 									</div>
 									<div class="cell border-button">

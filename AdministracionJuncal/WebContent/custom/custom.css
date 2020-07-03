@@ -403,6 +403,7 @@ body {
 mui-page {
    	padding-bottom: 60px;
    	height: 100% !important;
+   	background-color: #eee0;
 }
 
 .mui-page-header {
@@ -560,7 +561,7 @@ mui-page {
 	display: table;
 }
 .heading {
-	background-color: #2196f3;
+	background-color: #8199ad;
 	color: white;
 	display: table-row;
 	font-weight: bold;
@@ -631,6 +632,25 @@ mui-page {
     position: relative;
 }
 
+.card-contenido {
+	min-height: 43%;
+    height: 129px;
+    margin: 0;
+    background-color: #4580b1;
+    color: white;
+    padding: 10px 5px;
+}
+
+.card-option-aux {
+	width: 300px;
+	min-width: 300px;
+	height: 230px;
+    border: 2px solid #2196f3;
+    text-align: center;
+    margin: 10px 20px;
+    box-shadow: 0 0 20px 0 rgba(0, 0, 0, 0.2), 0 5px 5px 0 rgba(0, 0, 0, 0.24);
+}
+
 .card-option {
 	width: 300px;
 	min-width: 300px;
@@ -644,14 +664,32 @@ mui-page {
     box-shadow: 0 0 20px 0 rgba(0, 0, 0, 0.2), 0 5px 5px 0 rgba(0, 0, 0, 0.24);
 }
 
+.div-title-card-aux {
+	background-color: #0d70bf;
+    opacity: 0.8;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+}
+
 .div-title-card {
-	background-color: #2196f3;
+	background-color: #2196f3;opacity:0.8;
+/* 	background-color: #2196f3; */
 	height: 40px;
 	display: flex;
 	margin-top: 2px;
 	align-items: center;
     justify-content: center;
     border-radius: 10px 10px 0px 0px;
+}
+
+.button-card .ui-button--type-primary.ui-button--color-primary {
+    background-color: #0d70bf;
+    opacity: 0.8;
+    height: 57px;
+    width: 100%;
 }
 
 .title-card {
